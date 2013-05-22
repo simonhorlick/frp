@@ -8,6 +8,7 @@ import Prelude hiding ((.), id)
 control whenInhibited whenProduced wire = loop wire clockSession
   where
     loop w' session' = do
+      -- run a discrete time step of the wire
       (mx, w, session) <- stepSessionP w' session' ()
       case mx of
         Left ex -> whenInhibited ex
