@@ -29,7 +29,7 @@ main = do
     , GLFW.displayOptions_numBlueBits  = 8
     , GLFW.displayOptions_numDepthBits = 1 }
 
-  control return (putStrLn . show) $ positionWire . timeFrom 0
+  control return print $ positionWire . timeFrom 0
 
 getJoystickDirections :: IO (Float, Float)
 getJoystickDirections = do
@@ -40,12 +40,12 @@ getJoystickDirections = do
       [x, y] -> (x, y)
       _      -> (0, 0)
 
-positionWire :: Wire () IO Time Float
-positionWire = accum (+) 0 . joystickWire
+positionWire :: Wire () IO Time (Float,Float)
+positionWire = accum (+) (0, 0) . joystickWire
 
-joystickWire :: Wire () IO Time Float
+joystickWire :: Wire () IO Time (Float,Float)
 joystickWire = mkFixM $
   \dt t -> do
-    (x,y) <- getJoystickDirections
-    return (Right (x*(double2Float dt)))
+    (x, y) <- getJoystickDirections
+    return (Right (x * double2Float dt, y * double2Float dt))
 
