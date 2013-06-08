@@ -43,9 +43,16 @@ getJoystickDirections = do
 positionWire :: Wire () IO Time (Float,Float)
 positionWire = accum (+) (0, 0) . joystickWire
 
+-- Scales input so small movements have little affect and large movements have
+-- significant affect.
+deadzone :: Float -> Float
+deadzone x = if (abs x < deadzoneDefault) then 0 else x*x*x
+
+deadzoneDefault = 0.16 -- best deadzone for my controller
+
 joystickWire :: Wire () IO Time (Float,Float)
 joystickWire = mkFixM $
   \dt t -> do
     (x, y) <- getJoystickDirections
-    return (Right (x * double2Float dt, y * double2Float dt))
+    return (Right (deadzone x * double2Float dt, deadzone y * double2Float dt))
 
